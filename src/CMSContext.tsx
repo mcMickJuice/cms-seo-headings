@@ -25,15 +25,23 @@ export const usePageContentHeader = (contentId: string): HeadingOptions => {
   const context = useContext(CMSPageContext);
 
   if (context == null) return {};
-  const headingConfig = context.pageContent.header_tag_treatment.find(
+  const headingConfigs = context.pageContent.header_tag_treatment.filter(
     (t) => t.content_id === contentId,
   );
-  if (headingConfig == null) return {};
-
-  return {
-    headingTag:
-      headingConfig.field === "heading" ? headingConfig.tag : undefined,
-    subheadingTag:
-      headingConfig.field === "subheading" ? headingConfig.tag : undefined,
+  if (headingConfigs.length === 0) return {};
+  const headingConfig: HeadingOptions = {
+    headingTag: undefined,
+    subheadingTag: undefined,
   };
+  headingConfigs.forEach((config) => {
+    if (config.field === "heading") {
+      headingConfig.headingTag = config.tag;
+      return;
+    }
+    if (config.field === "subheading") {
+      headingConfig.subheadingTag = config.tag;
+      return;
+    }
+  });
+  return headingConfig;
 };

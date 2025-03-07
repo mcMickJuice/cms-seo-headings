@@ -1,11 +1,28 @@
 import { CMSSection, FullWidthBanner, Storyblock } from "./CMSContentTypes";
+import { CMSPageContextProvider } from "./CMSContext";
 import "./styles.css";
 import { PageContent } from "./types";
-const data: PageContent = {
+const pageData: PageContent = {
   id: "page-content",
   content_type_id: "page-layout",
   name: "page",
-  header_tag_treatment: [],
+  header_tag_treatment: [
+    {
+      content_id: "full-width-1",
+      tag: "h1",
+      field: "heading",
+    },
+    {
+      content_id: "storyblock-1",
+      tag: "h3",
+      field: "heading",
+    },
+    {
+      content_id: "storyblock-1",
+      tag: "h5",
+      field: "subheading",
+    },
+  ],
   data: [
     {
       contentTypeId: "full-width",
@@ -24,9 +41,11 @@ const data: PageContent = {
 export default function App() {
   return (
     <div>
-      {data.data.map((d) => (
-        <CMSSection key={d.contentId} content={d} />
-      ))}
+      <CMSPageContextProvider pageContent={pageData}>
+        {pageData.data.map((d) => (
+          <CMSSection key={d.contentId} content={d} />
+        ))}
+      </CMSPageContextProvider>
     </div>
   );
 }
