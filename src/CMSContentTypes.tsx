@@ -4,10 +4,15 @@ import {
   CMSContent,
   CMSContentTypeId,
   FullWidthCMSData,
+  HeadingOptions,
   HeadingTag,
   StoryBlockData,
 } from "./types";
+
+// OPTION 1 - CMS components call the usePageContentHeader hook. CMS components that don't render heading components will not call this
+// OPTION 2 - HeadingOptions are provided as props to all CMS components. It's up to them to use these props.
 export const FullWidthBanner = (data: FullWidthCMSData) => {
+  // OPTION 1 - components call usePageContentHeader hook to get heading options
   const headingTags = usePageContentHeader(data.contentId);
   const headingTag = headingTags.headingTag ?? "h2";
   const subHeadingTag = headingTags.subheadingTag ?? "h3";
@@ -28,10 +33,10 @@ const Heading = ({ children, as }: { children: string; as: HeadingTag }) => {
   if (as === "h5") return <h5>{children}</h5>;
   return null;
 };
-export const Storyblock = (data: StoryBlockData) => {
-  const headingTags = usePageContentHeader(data.contentId);
-  const headingTag = headingTags.headingTag ?? "h2";
-  const subHeadingTag = headingTags.subheadingTag ?? "h3";
+export const Storyblock = (data: StoryBlockData & HeadingOptions) => {
+  // re: OPTION 2 - components are passed in heading options, they don't need to call it
+  const headingTag = data.headingTag ?? "h2";
+  const subHeadingTag = data.subheadingTag ?? "h3";
   return (
     <div>
       <em>Storyblock Data</em>
@@ -58,7 +63,9 @@ const getCMSComponent = (
   return c;
 };
 export const CMSSection = ({ content }: { content: CMSContent }) => {
+  // OPTION 2: call hook outside of CMS component, then pass in heading options as part of props
+  const headingOptions = usePageContentHeader(content.contentId);
   const Component = getCMSComponent(content.contentTypeId);
 
-  return <Component {...content} />;
+  return <Component {...content} {...headingOptions} />;
 };
